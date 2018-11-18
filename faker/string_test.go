@@ -66,7 +66,7 @@ func TestRandString(t *testing.T) {
 		{[]string{}, ""},
 		{nil, ""},
 		{[]string{"a"}, "a"},
-		{[]string{"a", "b", "c", "d", "e", "f"}, "f"},
+		{[]string{"a", "b", "c", "d", "e", "variableFunc"}, "variableFunc"},
 	} {
 		Global.Seed(44)
 		got := Global.RandString(test.in)
@@ -84,7 +84,7 @@ func TestShuffleStrings(t *testing.T) {
 	Global.ShuffleStrings([]string{"a"})
 	Global.ShuffleStrings(nil)
 
-	a := []string{"a", "b", "c", "d", "e", "f", "g", "h"}
+	a := []string{"a", "b", "c", "d", "e", "variableFunc", "g", "h"}
 	b := make([]string, len(a))
 	copy(b, a)
 	Global.ShuffleStrings(a)

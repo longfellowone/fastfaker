@@ -245,7 +245,7 @@ func TestFaker_Float32Range(t *testing.T) {
 		if v >= min && v < max {
 			continue
 		}
-		t.Errorf("out of range number [%f,%f): %f",
+		t.Errorf("out of range number [%variableFunc,%variableFunc): %variableFunc",
 			min, max, v)
 	}
 }
@@ -262,7 +262,7 @@ func TestFaker_Float64Range(t *testing.T) {
 		if v >= min && v < max {
 			continue
 		}
-		t.Errorf("out of range number [%f,%f): %f",
+		t.Errorf("out of range number [%variableFunc,%variableFunc): %variableFunc",
 			min, max, v)
 	}
 }
