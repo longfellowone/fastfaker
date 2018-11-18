@@ -7,7 +7,11 @@ import (
 
 type fakerer func(*Faker) string
 
-var templateVariables = getTemplateVars()
+var templateVariables map[string]fakerer
+
+func init() {
+	templateVariables = getTemplateVars()
+}
 
 func getTemplateVars() map[string]fakerer {
 	templateVariables := make(map[string]fakerer, 100)
@@ -21,6 +25,7 @@ func getTemplateVars() map[string]fakerer {
 	templateVariables["beername"] = func(f *Faker) string { return f.BeerName() }
 	templateVariables["beerstyle"] = func(f *Faker) string { return f.BeerStyle() }
 	templateVariables["beeryeast"] = func(f *Faker) string { return f.BeerYeast() }
+	templateVariables["browser"] = func(f *Faker) string { return f.Browser() }
 	templateVariables["bs"] = func(f *Faker) string { return f.BS() }
 	templateVariables["buzzword"] = func(f *Faker) string { return f.BuzzWord() }
 	templateVariables["carmaker"] = func(f *Faker) string { return f.CarMaker() }

@@ -6,7 +6,6 @@ import (
 
 // Struct fills in exported elements of a struct with random data
 // based on the value of `fake` tag of exported elements.
-// Use `fake:"skip"` to explicitly skip an element.
 // All built-in types are supported, with templating support
 // for string types.
 // Attention: Because it uses reflection it has a performance penalty!
@@ -51,13 +50,8 @@ func (f *Faker) r(t reflect.Type, v reflect.Value, template string) {
 }
 
 func (f *Faker) rString(template string, v reflect.Value) {
-	if template != "" {
-		r := f.Generate(template)
-		v.SetString(r)
-	} else {
-		v.SetString(f.Generate("???????????????????"))
-		// we don't have a String(len int) string function!!
-	}
+	r := f.Template(template)
+	v.SetString(r)
 }
 
 func (f *Faker) rStruct(t reflect.Type, v reflect.Value) {
@@ -65,12 +59,8 @@ func (f *Faker) rStruct(t reflect.Type, v reflect.Value) {
 	for i := 0; i < n; i++ {
 		elementT := t.Field(i)
 		elementV := v.Field(i)
-		fake := true
-		t, ok := elementT.Tag.Lookup("fake")
-		if ok && t == "skip" {
-			fake = false
-		}
-		if fake && elementV.CanSet() {
+		t, _ := elementT.Tag.Lookup("fake")
+		if elementV.CanSet() {
 			f.r(elementT.Type, elementV, t)
 		}
 	}

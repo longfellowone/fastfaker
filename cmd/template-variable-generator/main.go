@@ -108,7 +108,11 @@ import (
 
 type fakerer func(*Faker) string
 
-var templateVariables = getTemplateVars()
+var templateVariables map[string]fakerer
+
+func init() {
+	templateVariables = getTemplateVars()
+}
 
 func getTemplateVars() map[string]fakerer {
 	templateVariables := make(map[string]fakerer, 100)
