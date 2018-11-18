@@ -2,11 +2,61 @@ package faker
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 )
 
 func TestFaker_TemplateCustom(t *testing.T) {
+	for _, test := range []struct {
+		template, stardDelim, endDelim, should string
+	}{
+		{"%name%", "%", "%", "Jeromy Schmeler"},
+		{"%%name%%", "%", "%", "%Jeromy Schmeler%"},
+		{"%%name%%", "%%", "%%", "Jeromy Schmeler"},
+		{"#name#", "#", "#", "Jeromy Schmeler"},
+		{"##name##", "##", "##", "Jeromy Schmeler"},
+		{"{{name}}", "{{", "}}", "Jeromy Schmeler"},
+		{"{{{name}}}", "{{{", "}}}", "Jeromy Schmeler"},
+		{"~name~", "~", "~", "Jeromy Schmeler"},
+		{"~name}", "~", "}", "Jeromy Schmeler"},
+		{"{{name}", "{{", "}", "Jeromy Schmeler"},
+		{"<name>", "<", ">", "Jeromy Schmeler"},
+	} {
+		fastFaker := NewFastFaker()
+		fastFaker.Seed(42)
+		got, err := fastFaker.TemplateCustom(test.template, test.stardDelim, test.endDelim)
+		if err != nil {
+			t.Error(err)
+		}
+		if got == test.should {
+			continue
+		}
 
+		t.Errorf("fot template '%s', got '%s' should '%s'",
+			test.template, got, test.should)
+	}
+}
+func TestFaker_TemplateCustom2(t *testing.T) {
+	should := "😀o😀Jeromy Schmeler😀😀"
+	for _, count := range []int{1, 2, 3, 4, 5, 10} {
+		for _, delimRune := range TemplateAllowedDelimiters {
+			delim := strings.Repeat(string(delimRune), count)
+			template := fmt.Sprintf("😀o😀%sname%s😀😀", delim, delim)
+
+			fastFaker := NewFastFaker()
+			fastFaker.Seed(42)
+			got, err := fastFaker.TemplateCustom(template, delim, delim)
+			if err != nil {
+				t.Error(err)
+			}
+			if got == should {
+				continue
+			}
+
+			t.Errorf("fot template '%s', got '%s' should '%s'",
+				template, got, should)
+		}
+	}
 }
 
 func TestFaker_Template(t *testing.T) {

@@ -6,10 +6,11 @@ import (
 )
 
 type fakerer func(*Faker) string
-var templateVariables map[string]fakerer
 
-func init() {
-	templateVariables = make(map[string]fakerer)
+var templateVariables = getTemplateVars()
+
+func getTemplateVars() map[string]fakerer {
+	templateVariables := make(map[string]fakerer, 100)
 	
 	templateVariables["avatarurl"] = func(f *Faker) string { return f.AvatarURL() }
 	templateVariables["beeralcohol"] = func(f *Faker) string { return f.BeerAlcohol() }
@@ -124,4 +125,5 @@ func init() {
 	templateVariables["year"] = func(f *Faker) string { return strconv.Itoa(int(f.Year())) }
 	templateVariables["zip"] = func(f *Faker) string { return f.Zip() }
 	
+	return templateVariables
 }

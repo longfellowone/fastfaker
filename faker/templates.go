@@ -2,23 +2,25 @@ package faker
 
 import (
 	"bytes"
-	"log"
+	"fmt"
 	"regexp"
 	"strings"
-
-	"github.com/pkg/errors"
 )
 
 // Template replaces all the found variables into the template with the actual
 // results from the Faker.*() function.
 //		fastFaker.Template("Hello {name}!") //Hello Jeromy Schmeler!
 // For a list of all the variables see ./templates_variables.md
+// All the "#" will be replaced by a digit and all the "?" by a ASCII letter.
 // To use custom delimiters (instead of {}) see TemplateCustom()
 func (f *Faker) Template(pattern string) string {
-	result, err := f.TemplateCustom(pattern, "{", "}")
-	if err != nil {
-		log.Panic("TemplateCustom is not working with default {}")
-	}
+
+	//to allow simple patterns like phone numbers ##-###-###-###
+	//and be backward compatibility with Generate()
+	pattern = f.Numerify(pattern)
+	pattern = f.Lexify(pattern)
+
+	result, _ := f.TemplateCustom(pattern, "{", "}")
 	return result
 }
 
@@ -27,16 +29,38 @@ type keyPos struct {
 	variableFunc fakerer
 }
 
+// TemplateAllowedDelimiters the runes that are allowed as variable delimiters
+// in Custom Templates. Must be ASCII (1 byte size) and not interfere with the regex expressions.
+const TemplateAllowedDelimiters = "{}%#~<>-:@`"
+
 func (f *Faker) TemplateCustom(template, delimStart, delimEnd string) (string, error) {
-	var pattern, err = regexp.Compile(`(\` + delimStart + `[a-zA-Z0-9_-]+\` + delimEnd + `)`)
-	if err != nil {
-		return "", errors.New("wrong delimiter characters, try {} or %%")
+
+	//edge case, the template is only a variable "name"
+	if delimStart == "" || delimEnd == "" {
+		variableFunc, exists := templateVariables[template]
+		if exists {
+			return variableFunc(f), nil
+		}
+		return template, nil
 	}
+
+	for _, r := range delimStart + delimEnd {
+		if strings.ContainsRune(TemplateAllowedDelimiters, r) == false {
+			return "", fmt.Errorf("delimiters error, supported ones are: '%s'", TemplateAllowedDelimiters)
+		}
+	}
+
+	//To allow more TemplateAllowedDelimiters we must add escape characters to each rune
+	//for example for a delimiter "|||" we must transform it to "\|\|\|"
+
+	//better Panic than sorry
+	var pattern = regexp.MustCompile(`(` + delimStart + `[a-zA-Z0-9_-]+` + delimEnd + `)`)
 
 	templateAsByte := []byte(template)
 	indexes := pattern.FindAllIndex(templateAsByte, -1)
 
-	//filter templateVariables
+	//filter templateVariables, we will find all the locations in the template
+	//of all variables.
 	var toReplace []keyPos
 	for _, match := range indexes {
 		start := match[0]
