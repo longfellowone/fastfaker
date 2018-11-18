@@ -1,8 +1,12 @@
 # FastFaker Templates
 
-This document contains all the available variables, with examples that can be used with the Faker.Template and Faker.Struct functions.
+This document contains all the available variables, with examples that can be used with the Faker.Template, Faker.TemplateCustom and Faker.Struct methods.
 
-For more info see [Readme](../README.md).
+A variable is an alias to the public Faker method with the same name, for example:
+* **&#123;name&#125;** will be replaced by the result from Faker.Name() method
+* **&#123;hackernoun&#125;** will be replaced by the result from Faker.HackerNoun() method
+
+For more info see [TEMPLATES](./TEMPLATES.md).
 
 | Variable | Example |
 |---------|--------|

@@ -7,11 +7,11 @@ import (
 
 type Basic struct {
 	s string
-	S string `fake:"{url}"`
+	S string
 }
 
 type Nested struct {
-	A   string `fake:"name"`
+	A   string
 	B   *Basic
 	bar *Basic
 }
@@ -119,22 +119,32 @@ func TestStructWithTemplate(t *testing.T) {
 func ExampleFaker_Struct() {
 	Global.Seed(42)
 	type Foo struct {
+		//for all the possible template variables see TEMPLATE_VARIABLES.md
 		Browser string `fake:"{browser}"`
-		Name    string `fake:"{beername}"`
+		Drink   string `fake:"{beername}"`
+		Phone   string `fake:"##-###-###"`
+		Blob    string `fake:"?????"`
 		Int     int
 		Dice    uint8
 		Pointer *int
+		Skip    *string `fake:"skip"`
 	}
 	var f Foo
 	Global.Struct(&f)
 	fmt.Printf("%s\n", f.Browser)
-	fmt.Printf("%s\n", f.Name)
+	fmt.Printf("%s\n", f.Drink)
+	fmt.Printf("%s\n", f.Phone)
+	fmt.Printf("%s\n", f.Blob)
 	fmt.Printf("%d\n", f.Int)
 	fmt.Printf("%d\n", f.Dice)
 	fmt.Printf("%d\n", *f.Pointer)
+	fmt.Printf("%v\n", f.Skip)
 	// Output: firefox
 	//Samuel Smith’s Oatmeal Stout
-	//-3651589698752897048
-	//62
-	//-8819218091111228151
+	//80-357-683
+	//ptneu
+	//-4923402592883905764
+	//4
+	//-2620303913143990366
+	//<nil>
 }

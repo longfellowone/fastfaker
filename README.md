@@ -8,6 +8,7 @@ FastFaker is a data generator written in go. It can generate over 50 data types 
 - Zero dependencies (no external calls, no vendor, dep or modules required)
 - Randomizes user defined structs
 - Over 130 functions for regular use
+- Templates with over 110 variables
 - Extensible
 - Concurrent safe
 - Go 1.x compatibility
@@ -58,8 +59,8 @@ func main() {
 
 	// Create structs with random injected data
 	type Foo struct {
-		Browser string `fake:"{internet.browser}"`
-		Name    string `fake:"{beer.name}"`
+		Browser string `fake:"{browser}"`
+		Name    string `fake:"{beername}"`
 		Int     int
 		Dice    uint8
 		Pointer *int
@@ -105,6 +106,17 @@ BenchmarkNewSafeFaker_Parallel-4           50000             30893 ns/op        
 BenchmarkNewFastFaker_Parallel-4          300000              3829 ns/op               0 B/op          0 allocs/op
 ```
 
+## Templates
+Templates are the most powerful feature of the FastFaker package. It allows custom patterns/templates of text to be filled with over 110 random types of [data (variables)](./TEMPLATE_VARIABLES.md).
+
+It can be used directly (faker.Template* methods) or via the faker.Struct fill method and `fake:` tags. 
+
+```go
+fastFaker.Template("I'm {name}, call me at ###-###-####!") // I'm John, call me at 152-335-8761!
+```
+
+You can use even HTML or JSON templates, for more info check the [TEMPLATES section](./TEMPLATES.md)
+
 ### /Data [![godoc](https://godoc.org/github.com/bgadrian/fastfaker?status.svg)](https://godoc.org/github.com/bgadrian/fastfaker/data)
 If you want to use the raw data that the Faker uses internally (like Names, Streets, Countries and Companies) you can import the [Data package](./data) directly,see its documentation.
 
@@ -120,9 +132,7 @@ Differences between `gofakeit` and `fastfaker` (more in the [changelog](./CHANGE
 * different documentation, new examples and tests
 * non deterministic (using the same `Seed` on `fastfaker` may lead to different results, eg Name(), than the same seed with `gofakeit`)
 * usage, instead of `gofakeit.Name()` the calls are `faker.Global.Name()` or `faker.NewFastFaker().Name()`
-* versioning, `fastfaker` uses the semantic version, making it compatible with go modules
-* `fastfaker` generates Unicode strings (multi-byte runes)
-* `fastfaker` may return non-english data and non-US addresses
+* `fastfaker` uses the semantic version, making it compatible with go modules
 
 ## Change log
 I try to [keep it updated here](./CHANGELOG.md).

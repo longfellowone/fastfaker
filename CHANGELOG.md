@@ -1,5 +1,14 @@
 # FastFaker change log
 
+### v2.0.0
+Brand new template system. Unlike the old Generate() and Struct() methods that were limited to the /data and basic types, templates allows custom patterns to call all the Faker methods. 
+
+The method Generate() was removed and replaced with Template(), acts in the same way, but with different variables.
+
+Struct tags and Hacker phrases now use the Template() method.
+
+For more details see the [Templates readme](./TEMPLATES.md)
+
 ### v1.1.2
 Optimizations
 

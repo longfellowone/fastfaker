@@ -23,8 +23,8 @@ func main() {
 
 	// Create structs with random injected data
 	type Foo struct {
-		Browser string `fake:"{internet.browser}"`
-		Name    string `fake:"{beer.name}"`
+		Browser string `fake:"{browser}"`
+		Name    string `fake:"{beername}"`
 		Int     int
 		Dice    uint8
 		Pointer *int

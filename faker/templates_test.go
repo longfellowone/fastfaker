@@ -36,7 +36,35 @@ func TestFaker_TemplateCustom(t *testing.T) {
 			test.template, got, test.should)
 	}
 }
-func TestFaker_TemplateCustom2(t *testing.T) {
+func TestFaker_TemplateCustomEdgeCases(t *testing.T) {
+	fastFaker := NewFastFaker()
+
+	res, err := fastFaker.TemplateCustom("{name}", "", "}")
+	if err != nil {
+		t.Error(err)
+	}
+	if res != "{name}" {
+		t.Error("should have left the template unchanged with an empty delimiter")
+	}
+
+	res, err = fastFaker.TemplateCustom("|name|", "|", "|")
+	if res != "|name|" {
+		t.Error("should have left the template unchanged with an invalid delimiter")
+	}
+	if err == nil {
+		t.Error("should have returned error with an invalid delimiter")
+	}
+
+	res, err = fastFaker.TemplateCustom("name", "", "")
+	if err != nil {
+		t.Error(err)
+	}
+	if res == "name" {
+		t.Error("should work with a single variable")
+	}
+}
+
+func TestFaker_TemplateCustomDelimiters(t *testing.T) {
 	should := "😀o😀Jeromy Schmeler😀😀"
 	for _, count := range []int{1, 2, 3, 4, 5, 10} {
 		for _, delimRune := range TemplateAllowedDelimiters {
@@ -136,4 +164,35 @@ func ExampleFaker_TemplateJSON() {
 
 	fmt.Printf("%s\n", fastFaker.Template(template))
 	// Output:{name:"Jeromy Schmeler", age: 8}
+}
+
+func ExampleFaker_TemplateHTML() {
+	template := `<ul class="person">
+	<li>Name: {name}</li>
+	<li>Age: ##</li>
+	<li>Number: {phone}</li>
+	<li>Address: {street}, {city} {country}</li>
+</ul>`
+
+	fastFaker := NewFastFaker() // not concurrent safe, see NewSafeFaker()
+	fastFaker.Seed(42)          //for each seed value will generate a different result
+
+	fmt.Printf("%s\n", fastFaker.Template(template))
+	// Output: <ul class="person">
+	//	<li>Name: Kim Steuber</li>
+	//	<li>Age: 57</li>
+	//	<li>Number: 3576839758</li>
+	//	<li>Address: 21542 North Clubview, Schimmelborough Mozambique</li>
+	//</ul>
+}
+
+func TestFaker_TemplateVariables(t *testing.T) {
+	fastFaker := NewFastFaker() // not concurrent safe, see NewSafeFaker()
+
+	for variable := range templateVariables {
+		template := fmt.Sprintf("{%s}", variable)
+		if fastFaker.Template(template) == template {
+			t.Errorf("failed for variable %s", variable)
+		}
+	}
 }

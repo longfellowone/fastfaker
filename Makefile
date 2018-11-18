@@ -15,4 +15,4 @@ bench: pre
 generate:
 	go run cmd/template-variable-generator/main.go go > templates_variables.go
 	mv templates_variables.go faker/templates_variables.go
-	go run cmd/template-variable-generator/main.go mark > faker/templates_variables.md
+	go run cmd/template-variable-generator/main.go mark > TEMPLATE_VARIABLES.md

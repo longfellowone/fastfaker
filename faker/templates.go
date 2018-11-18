@@ -10,9 +10,11 @@ import (
 // Template replaces all the found variables into the template with the actual
 // results from the Faker.*() function.
 //		fastFaker.Template("Hello {name}!") //Hello Jeromy Schmeler!
-// For a list of all the variables see ./templates_variables.md
+//
 // All the "#" will be replaced by a digit and all the "?" by a ASCII letter.
+//
 // To use custom delimiters (instead of {}) see TemplateCustom()
+// For more details and examples see TEMPLATES.md
 func (f *Faker) Template(pattern string) string {
 
 	//to allow simple patterns like phone numbers ##-###-###-###
@@ -33,10 +35,20 @@ type keyPos struct {
 // in Custom Templates. Must be ASCII (1 byte size) and not interfere with the regex expressions.
 const TemplateAllowedDelimiters = "{}%#~<>-:@`"
 
+// TemplateCustom replaces all the found variables into the template with the actual
+// results from the Faker.*() function.
+//		fastFaker.Template("Hello {name}!") //Hello Jeromy Schmeler!
+//
+// It needs a start and end variable delimiters (delimStart, delimEnd).
+// They can only contain runes from TemplateAllowedDelimiters.
+// There is no constraint on the number of characters.
+// Examples of valid delimiters: {{name}}, %%%name%%% or mixed: <<%name>>
+//
+// It uses Regex to find all the variables.
 func (f *Faker) TemplateCustom(template, delimStart, delimEnd string) (string, error) {
 
 	//edge case, the template is only a variable "name"
-	if delimStart == "" || delimEnd == "" {
+	if delimStart == "" || delimEnd == "" || len(template) < 3 {
 		variableFunc, exists := templateVariables[template]
 		if exists {
 			return variableFunc(f), nil
@@ -46,7 +58,7 @@ func (f *Faker) TemplateCustom(template, delimStart, delimEnd string) (string, e
 
 	for _, r := range delimStart + delimEnd {
 		if strings.ContainsRune(TemplateAllowedDelimiters, r) == false {
-			return "", fmt.Errorf("delimiters error, supported ones are: '%s'", TemplateAllowedDelimiters)
+			return template, fmt.Errorf("delimiters error, supported ones are: '%s'", TemplateAllowedDelimiters)
 		}
 	}
 
